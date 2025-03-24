@@ -3,10 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Benim Web Sitem</title>
+    <title>Sports Match Results</title>
 </head>
 <body>
-    <h1>Armagan Cetin,200303026</h1>
+    <h1>Takım Seç</h1>
+    <input type="text" id="teamName" placeholder="Takım adını gir...">
+    <button onclick="getMatches()">Son Maçları Göster</button>
+    <div id="results"></div>
+
+    <script>
+        async function getMatches() {
+            let team = document.getElementById("teamName").value;
+            let response = await fetch(`https://www.thesportsdb.com/api/v1/json/3/searchteams.php?t=${team}`);
+            let data = await response.json();
+
+            if (data.teams) {
+                let teamID = data.teams[0].idTeam;
+                let matchResponse = await fetch(`https://www.thesportsdb.com/api/v1/json/3/eventslast.php?id=${teamID}`);
+                let matchData = await matchResponse.json();
+
+                let resultsHTML = "<h2>Son Maçlar</h2>";
+                matchData.results.forEach(match => {
+                    resultsHTML += `<p>${match.strEvent} - Skor: ${match.intHomeScore} - ${match.intAwayScore}</p>`;
+                });
+
+                document.getElementById("results").innerHTML = resultsHTML;
+            } else {
+                document.getElementById("results").innerHTML = "<p>Takım bulunamadı.</p>";
+            }
+        }
+    </script>
 </body>
 </html>
-
